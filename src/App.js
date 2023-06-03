@@ -1,25 +1,62 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { connect } from 'react-redux';
+import { addItem, deleteItem, updateNewItem } from './components/actions';
 
-function App() {
+function App({ newItem, items, addItem, deleteItem, updateNewItem }) {
+  const handleAddItem = async () => {
+    if (!newItem) {
+      alert('Enter an item.');
+      return;
+    }
+
+    const item = {
+      id: Math.floor(Math.random() * 1000),
+      value: newItem,
+    };
+
+    await addItem(item);
+  };
+
+  const handleDeleteItem = (id) => {
+    deleteItem(id);
+  };
+
+  const handleChange = (e) => {
+    updateNewItem(e.target.value);
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Todo List App</h1>
+      <input
+        id="newItem"
+        type="text"
+        placeholder="Add an item"
+        value={newItem}
+        onChange={handleChange}
+      />
+      <button onClick={handleAddItem}>Add</button>
+      <ul>
+        {items.map((item) => (
+          <li key={item.id}>
+            {item.value}
+            <button onClick={() => handleDeleteItem(item.id)}>delete</button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
 
-export default App;
+const mapStateToProps = (state) => ({
+  newItem: state.newItem,
+  items: state.items,
+});
+
+const mapDispatchToProps = {
+  addItem,
+  deleteItem,
+  updateNewItem,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
